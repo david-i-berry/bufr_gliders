@@ -9,7 +9,7 @@ library(httr)
 filepath <- "/local/test-data/input/Melonhead_496_R.nc"
 if( ! file.exists(filepath) ){
     GET( url = "https://linkedsystems.uk/erddap/files/Public_Glider_Data_0711/Melonhead_20180207/Melonhead_496_R.nc",
-         write_disk("/local/test-data/Melonhead_496_R.nc", overwrite = TRUE) )
+         write_disk(filepath, overwrite = TRUE) )
 }
 ncin <- nc_open(filepath)
 
@@ -41,13 +41,13 @@ density <- ncvar_get(ncin,'SIGMA_THETA')
 nc_close(ncin)
 
 # now sequence to encode
-wsi_series <- NA
-wsi_issuer <- NA
-wsi_issue_number <- NA
-wsi_local_identifier <- NA
-wmo_id <- NA
+wsi_series <- 0
+wsi_issuer <- 22000
+wsi_issue_number <- 0
+wsi_local_identifier <- "MELONHEAD"
+wmo_id <- 9999999
 station_name <- "MELONHEAD"
-agency <- NA # "UEA" not in code table
+agency <- NA # code table
 data_system <- NA # code table
 glider_model <- glider_model
 serial_number <- serial_number
@@ -80,7 +80,7 @@ end_hour <- as.numeric(format.POSIXct(end_datetime,'%H'))
 end_minute <- as.numeric(format.POSIXct(end_datetime,'%M'))
 end_second <- as.numeric(format.POSIXct(end_datetime,'%S'))
 
-dive_duration <- round(as.numeric(difftime(max(datetime[phase3]), min(datetime[phase1]), units = "min")))
+dive_duration <- -1*round(as.numeric(difftime(max(datetime[phase3]), min(datetime[phase1]), units = "min")))
 mean_lat <- round(mean( lat[c(phase1, phase2, phase3)]),5)
 mean_lon <- round(mean( lon[c(phase1, phase2, phase3)]),5)
 mean_current_speed <- NA
@@ -101,7 +101,7 @@ profile_lon <- round(lon[c(phase1,phase2,phase3)],5)
 gtspp_quality_qualifiers <- rep( c(20, 13, 10, 11, 25, 12, 26), times = length(c(phase1,phase2,phase3)))
 gtspp_quality_flags <- rep(c(NA, NA, NA, NA, NA, NA, NA), times = length(c(phase1,phase2,phase3)))
 profile_depth <- depth[c(phase1,phase2,phase3)]
-profile_pressure <- pressure[c(phase1,phase2,phase3)]*1000000 # convert dbar to Pa
+profile_pressure <- pressure[c(phase1,phase2,phase3)]*10000 # convert dbar to Pa
 profile_temperature <- temperature[c(phase1,phase2,phase3)] + 273.15
 profile_conductivity <- conductivity[c(phase1,phase2,phase3)]
 profile_salinity <- salinity[c(phase1,phase2,phase3)] # assuming equivalence between 1 ppt and 1 psu
@@ -115,9 +115,9 @@ headers <- list(
   "bufrHeaderCentre" = 0,
   "bufrHeaderSubCentre" = 0,
   "updateSequenceNumber" = 0,
-  "dataCategory" = 0,
-  "internationalDataSubCategory" = 6,
-  "dataSubCategory" = 0,
+  "dataCategory" = 31,
+  "internationalDataSubCategory" = 8,
+  "dataSubCategory" = NA,
   "masterTablesVersionNumber" = 39,
   "typicalYear" = 2018,
   "typicalMonth" = 2,
@@ -133,16 +133,16 @@ headers <- list(
 
 # convert to list, using eccodes keys
 data <- list(
-  "wigosIdentifierSeries" = NA,
-  "wigosIssuerOfIdentifier" = NA,
-  "wigosIssueNumber" = NA,
-  "wigosLocalIdentifierCharacter" = NA,
+  "wigosIdentifierSeries" = wsi_series,
+  "wigosIssuerOfIdentifier" = wsi_issuer,
+  "wigosIssueNumber" = wsi_issue_number,
+  "wigosLocalIdentifierCharacter" = wsi_local_identifier,
   # change data width
-  "marineObservingPlatformIdentifier" = NA,
+  "marineObservingPlatformIdentifier" = wmo_id,
   # cancel change data width
   "longStationName" = trimws(station_name),
-  "agencyInChargeOfOperatingObservingPlatform" = NA,
-  "dataCollectionLocationSystem" = NA,
+  "agencyInChargeOfOperatingObservingPlatform" = agency,
+  "dataCollectionLocationSystem" = data_system,
   "observingPlatformManufacturerModel" = trimws(glider_model),
   "observingPlatformManufacturerSerialNumber" = trimws(serial_number),
   "timeSignificance" = c(25,2,NA),
@@ -160,12 +160,11 @@ data <- list(
   "windDirection" = NA,
   "speedOfSeaSurfaceCurrent" = NA,
   "seaSurfaceCurrentDirection" = NA,
-  "timeSignificance" = NA,
-  "timePeriod" = NA,
+  "timePeriod" = dive_duration,
   "speedOfCurrent" = NA,
   "currentDirection" = NA,
-  "profileNumber" = NA,
-  "uniqueIdentifierForProfile" = NA,
+  "profileNumber" = 1,
+  "uniqueIdentifierForProfile" = "MYUID-1234",
   # "delayedDescriptorReplicationFactor" = 3,
   "directionOfProfile" = profile_direction,
   # "extendedDelayedDescriptorReplicationFactor" = c(67,149,90),

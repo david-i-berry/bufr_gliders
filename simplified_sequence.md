@@ -1,5 +1,3 @@
-# Proposal
-
 ## New Table B Entries
 
 __*Class 42: BUFR / CREX Oceanographic Elements*__

@@ -40,7 +40,6 @@ RUN echo "Acquire::Check-Valid-Until \"false\";\nAcquire::Check-Date \"false\";"
     && curl https://cran.r-project.org/src/contrib/httr_1.4.4.tar.gz --output httr_1.4.4.tar.gz \
     && R CMD INSTALL ncdf4_1.21.tar.gz \
     && R CMD INSTALL jsonlite_1.8.4.tar.gz \
-    && R CMD INSTALL httr_1.4.4.tar.gz \
     && pip install --upgrade pip \
     && curl https://confluence.ecmwf.int/download/attachments/45757960/eccodes-${ECCODES_VER}-Source.tar.gz --output eccodes-${ECCODES_VER}-Source.tar.gz \
     && tar xzf eccodes-${ECCODES_VER}-Source.tar.gz \

@@ -39,7 +39,8 @@ for key, value in headers.items():
                 value = [missing if v is None else v for v in value]
             codes_set_array(bufr_msg, key, value)
         else:
-            codes_set(bufr_msg, key, value)
+            if value is not None:
+                codes_set(bufr_msg, key, value)
 
 
 # data set values
